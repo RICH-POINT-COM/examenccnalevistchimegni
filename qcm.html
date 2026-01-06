@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen Final CCNA - Session Officielle</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+        }
+
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.5; }
+        .container { max-width: 900px; margin: 0 auto; background: var(--card); border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
+
+        /* Login Screen */
+        #login-screen { padding: 40px; text-align: center; }
+        .info-banner { background: #f1f5f9; border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: left; border-left: 5px solid var(--primary); }
+        .info-banner h3 { margin-top: 0; color: var(--primary); }
+        
+        .input-group { margin-bottom: 20px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
+
+        /* Header & Progress */
+        .header { background: #1e293b; color: white; padding: 20px; display: none; flex-wrap: wrap; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+        .header-info { font-size: 0.85rem; line-height: 1.4; flex: 1; }
+        .timer { font-family: monospace; font-size: 1.5rem; color: #fbbf24; font-weight: bold; margin-left: 15px; }
+        .progress-container { width: 100%; height: 6px; background: #334155; margin-top: 15px; border-radius: 3px; overflow: hidden; }
+        #progress-bar { height: 100%; background: var(--success); width: 0%; transition: width 0.3s; }
+
+        /* Quiz Questions */
+        .content { padding: 30px; display: none; }
+        .question-card { display: none; }
+        .question-card.active { display: block; animation: fadeIn 0.3s; }
+        .option { display: flex; align-items: center; padding: 16px; border: 2px solid #f1f5f9; border-radius: 12px; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+        .option.selected { border-color: var(--primary); background: #eff6ff; font-weight: bold; }
+
+        /* Navigation Alert */
+        #missing-alert { display: none; background: #fff1f2; padding: 15px; border-radius: 8px; color: var(--danger); margin-top: 15px; border: 1px solid #fecdd3; }
+        .q-link { cursor: pointer; text-decoration: underline; font-weight: bold; margin-right: 8px; color: var(--primary); }
+
+        /* Final Report */
+        #result-screen { display: none; padding: 40px; }
+        .decision { font-size: 1.5rem; font-weight: 800; padding: 10px 20px; border-radius: 8px; margin: 20px 0; display: inline-block; }
+        .pass { background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
+        .fail { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+
+        .correction-item { margin-bottom: 20px; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .status-badge { font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
+        .status-correct { background: #dcfce7; color: #166534; }
+        .status-wrong { background: #fee2e2; color: #991b1b; }
+        .explanation-box { margin-top: 10px; padding: 10px; background: #f8fafc; border-left: 4px solid var(--secondary); font-size: 0.9rem; font-style: italic; }
+
+        .footer { padding: 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: none; justify-content: space-between; align-items: center; }
+        .btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @media print { .no-print { display: none !important; } .container { box-shadow: none; border: none; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="login-screen">
+        <h1 style="color: var(--primary);">Examen Blanc CCNA</h1>
+        <p style="color: var(--secondary);">Session de validation - Enseignant : <strong>Elvis TCHIMEGNI</strong></p>
+        
+        <div class="info-banner">
+            <h3>📋 Détails de l'épreuve</h3>
+            <ul>
+                <li><strong>Chronomètre :</strong> 20 minutes</li>
+                <li><strong>Volume :</strong> 40 Questions</li>
+                <li><strong>Seuil de réussite :</strong> 35 / 40</li>
+                <li><strong>Tentative :</strong> Une seule soumission possible</li>
+            </ul>
+        </div>
+
+        <div class="input-group">
+            <label>Nom et Prénom de l'étudiant</label>
+            <input type="text" id="name" placeholder="Ex: Aboa Luisse">
+        </div>
+        <div class="input-group">
+            <label>Établissement</label>
+            <input type="text" id="school" placeholder="Ex: Lacalhost Academy">
+        </div>
+        <div class="input-group">
+            <label>Filière / Spécialité</label>
+            <input type="text" id="major" placeholder="Ex: Administration Système et Réseau">
+        </div>
+        
+        <button class="btn btn-primary" style="width: 100%; max-width: 500px;" onclick="startQuiz()">COMMENCER L'EXAMEN</button>
+    </div>
+
+    <div class="header" id="quiz-header">
+        <div class="header-info" id="display-info"></div>
+        <div class="timer" id="timer">20:00</div>
+        <div class="progress-container"><div id="progress-bar"></div></div>
+    </div>
+
+    <div class="content" id="quiz-content"></div>
+
+    <div class="footer" id="quiz-footer">
+        <button class="btn" onclick="move(-1)">Précédent</button>
+        <div id="q-counter" style="font-weight: bold;">1 / 40</div>
+        <button class="btn btn-primary" id="next-btn" onclick="move(1)">Suivant</button>
+        <button class="btn btn-success" id="finish-btn" onclick="checkCompletion()" style="display:none;">SOUMETTRE L'EXAMEN</button>
+        <div id="missing-alert">Questions vides (cliquez pour y aller) : <span id="missing-list"></span></div>
+    </div>
+
+    <div id="result-screen">
+        <div style="text-align:center;">
+            <h1>Rapport Officiel d'Examen CCNA</h1>
+            <p>Enseignant responsable : <strong>Elvis TCHIMEGNI</strong></p>
+            <div id="decision-box" class="decision"></div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--primary);" id="final-score"></div>
+            
+            <div id="student-report" style="margin: 20px 0; text-align: left; background: #f1f5f9; padding: 20px; border-radius: 12px; display: inline-block; min-width: 350px;"></div>
+            <br>
+            <button class="btn btn-primary no-print" onclick="window.print()">📥 Imprimer / Sauvegarder en PDF</button>
+        </div>
+        <hr style="margin: 40px 0;">
+        <h3 class="no-print">Correction détaillée :</h3>
+        <div id="correction-area"></div>
+    </div>
+</div>
+
+<script>
+/** * ZONE DE SÉCURITÉ ANTI-RÉOUVERTURE (MISE EN COMMENTAIRE POUR TESTS)
+ * Pour verrouiller l'examen après une tentative, décommentez le bloc ci-dessous.
+ */
+
+if (localStorage.getItem('ccna_exam_submitted')) {
+    document.body.innerHTML = `<div style="text-align:center; margin-top:100px; font-family:sans-serif;">
+        <h1 style="color:red;">🚫 Accès Refusé</h1>
+        <p>Vous avez déjà effectué et soumis votre tentative pour cet examen.</p>
+        <p>Contactez l'enseignant <b>Elvis TCHIMEGNI</b> pour toute réclamation.</p>
+    </div>`;
+}
+
+
+const QUESTIONS = [
+    { q: "Quelle est la caractéristique principale d'un réseau convergent ?", options: ["Fibre optique uniquement", "Voix, vidéo et données sur une même infrastructure", "Séparation physique téléphone/info", "Aucun routeur nécessaire"], a: 1, e: "Un réseau convergent achemine divers types de trafic (voix, vidéo, données) sur une infrastructure réseau unique." },
+    { q: "Quel élément assure la tolérance aux pannes ?", options: ["Coût élevé", "Redondance des liens", "Wi-Fi exclusif", "Suppression des pare-feu"], a: 1, e: "La redondance permet de maintenir la connectivité si un lien ou un équipement tombe en panne." },
+    { q: "Quel réseau s'étend sur une large zone géographique (géré par FAI) ?", options: ["LAN", "WLAN", "WAN", "PAN"], a: 2, e: "Le WAN (Wide Area Network) interconnecte des LAN sur de grandes distances géographiques." },
+    { q: "Quelle couche OSI gère le routage et l'adressage IP ?", options: ["Physique", "Liaison de données", "Réseau", "Transport"], a: 2, e: "La couche 3 (Réseau) s'occupe de l'adressage logique et du routage des paquets." },
+    { q: "Quelle est l'unité de données (PDU) de la couche Transport ?", options: ["Trame", "Paquet", "Segment", "Bit"], a: 2, e: "Le PDU de la couche 4 (Transport) s'appelle un segment." },
+    { q: "Quel protocole traduit les noms de domaine en IP ?", options: ["DHCP", "DNS", "HTTP", "FTP"], a: 1, e: "Le DNS fait correspondre des noms de sites à des adresses IP compréhensibles par les machines." },
+    { q: "Commande pour passer en mode privilégié (#) ?", options: ["configure terminal", "enable", "login", "exit"], a: 1, e: "La commande 'enable' permet de passer du mode utilisateur au mode privilégié." },
+    { q: "Commande pour chiffrer les mots de passe en clair ?", options: ["enable secret class", "service password-encryption", "line console 0", "copy run start"], a: 1, e: "Elle sécurise les mots de passe visibles dans le fichier de configuration." },
+    { q: "Que faut-il configurer pour gérer un switch à distance ?", options: ["Interface Loopback", "Interface SVI (Vlan) avec IP", "OSPF", "Câble console"], a: 1, e: "L'interface SVI (ex: Vlan 1) reçoit l'adresse IP de gestion du switch." },
+    { q: "Longueur d'une adresse IPv4 ?", options: ["32 bits", "48 bits", "64 bits", "128 bits"], a: 0, e: "Une adresse IPv4 est composée de 4 octets de 8 bits chacun, soit 32 bits." },
+    { q: "Adresse de broadcast pour 192.168.10.0/24 ?", options: ["192.168.10.1", "192.168.10.0", "192.168.10.254", "192.168.10.255"], a: 3, e: "Sur un masque /24, .255 est l'adresse de diffusion du segment." },
+    { q: "À quoi sert le masque de sous-réseau ?", options: ["Crypter les données", "Distinguer partie réseau/hôte", "Traduction DNS", "Attribuer IP auto"], a: 1, e: "Il indique quelle partie de l'IP identifie le réseau et quelle partie identifie l'équipement." },
+    { q: "Plage d'adresses privées de classe C ?", options: ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "169.254.0.0/16"], a: 2, e: "La plage 192.168.0.0/16 est réservée par la RFC 1918 pour l'usage privé." },
+    { q: "Combien de bits compose une adresse IPv6 ?", options: ["32", "64", "128", "256"], a: 2, e: "Une adresse IPv6 est codée sur 128 bits, souvent représentée en hexadécimal." },
+    { q: "Compression correcte pour 2001:0db8:0000:0000:0000:0000:0001 ?", options: ["2001:db8:0:0:0:0:0:1", "2001:db8::1", "2001:db8:::1", "2001:db8::"], a: 1, e: "Les doubles deux-points remplace la plus longue suite de zéros consécutifs." },
+    { q: "Adresse IPv6 Link-local commence par ?", options: ["2001::", "fe80::", "::1", "ff00::"], a: 1, e: "FE80::/10 est le préfixe réservé aux communications sur le lien local." },
+    { q: "Commande pour voir la table de routage ?", options: ["show ip int brief", "show run", "show ip route", "ping"], a: 2, e: "La commande 'show ip route' affiche les chemins connus par le routeur." },
+    { q: "Que signifie 'C' dans la table de routage ?", options: ["Connecté directement", "Statique", "OSPF", "RIP"], a: 0, e: "Le code 'C' indique un réseau dont l'interface est configurée sur le routeur même." },
+    { q: "Qu'est-ce que la distance administrative (AD) ?", options: ["Distance physique", "Nombre de sauts", "Fiabilité de la source de routage", "Vitesse du lien"], a: 2, e: "Elle définit la priorité entre différentes sources de routage (Static=1, RIP=120, etc)." },
+    { q: "Protocole de routage basé sur le nombre de sauts ?", options: ["OSPF", "EIGRP", "RIP", "BGP"], a: 2, e: "Le protocole RIP utilise le nombre de routeurs (hops) comme métrique de distance." },
+    { q: "Commande passerelle par défaut sur un switch ?", options: ["ip route 0.0.0.0", "ip default-gateway", "interface vlan 1", "ip address"], a: 1, e: "Elle permet de joindre le switch depuis un réseau différent du sien." },
+    { q: "Avantage de SSH sur Telnet ?", options: ["Plus rapide", "Plus facile", "Chiffre les communications", "Pas de login"], a: 2, e: "Contrairement à Telnet, SSH crypte les données et les mots de passe durant le transit." },
+    { q: "Encapsulation couche Transport vers Réseau : le segment devient ?", options: ["Un paquet", "Une trame", "Des bits", "Une adresse MAC"], a: 0, e: "L'ajout d'une adresse IP à un segment de transport crée un paquet." },
+    { q: "Commande pour voir la config de démarrage (NVRAM) ?", options: ["show running-config", "show startup-config", "show version", "show flash"], a: 1, e: "La startup-config est le fichier chargé au démarrage depuis la NVRAM." },
+    { q: "Rôle du DHCP ?", options: ["Routage", "Traduction nom/IP", "Attribution dynamique d'IP", "Transfert fichier"], a: 2, e: "Le DHCP distribue automatiquement les paramètres IP aux clients du réseau." },
+    { q: "Adresse de bouclage IPv4 ?", options: ["127.0.0.1", "192.168.1.1", "0.0.0.0", "255.255.255.255"], a: 0, e: "127.0.0.1 (localhost) sert à tester la pile logicielle TCP/IP locale." },
+    { q: "Commande pour nommer un routeur ?", options: ["name", "hostname", "description", "title"], a: 1, e: "La commande 'hostname' change le nom de l'équipement dans le prompt." },
+    { q: "But de 'banner motd' ?", options: ["Régler l'heure", "Message d'avertissement légal", "Nom du routeur", "Mot de passe"], a: 1, e: "Il sert à afficher des avertissements juridiques lors de la connexion." },
+    { q: "Notation CIDR pour 255.255.255.0 ?", options: ["/8", "/16", "/24", "/32"], a: 2, e: "Un masque de 255.255.255.0 contient 24 bits activés à 1." },
+    { q: "Protocole sécurisé pour CLI à distance ?", options: ["Telnet", "HTTP", "SSH", "TFTP"], a: 2, e: "SSH est le standard actuel pour l'administration sécurisée à distance." },
+    { q: "Commande pour allumer une interface ?", options: ["enable", "start", "no shutdown", "activation"], a: 2, e: "'no shutdown' lève l'arrêt administratif d'une interface Cisco." },
+    { q: "Rôle du TTL ?", options: ["Vitesse", "Éviter les boucles infinies", "Vérifier erreurs", "Identifier source"], a: 1, e: "Le Time To Live diminue à chaque saut pour éviter qu'un paquet ne tourne en boucle." },
+    { q: "Protocole utilisé par Ping ?", options: ["HTTP", "ICMP", "TCP", "UDP"], a: 1, e: "Ping utilise le protocole de contrôle ICMP pour vérifier la connectivité." },
+    { q: "Différence modèle TCP/IP vs OSI ?", options: ["TCP/IP a 7 couches", "TCP/IP a 4 couches", "Pareil", "OSI pour wifi"], a: 1, e: "Le modèle TCP/IP est plus simple et correspond mieux aux protocoles réels." },
+    { q: "Communication 'Un vers plusieurs' (groupe) ?", options: ["Unicast", "Broadcast", "Multicast", "Simulcast"], a: 2, e: "Le Multicast permet d'envoyer un flux à une sélection spécifique d'hôtes." },
+    { q: "Signification préfixe /64 en IPv6 ?", options: ["64 bits réseau / 64 bits hôte", "Adresse fait 64 bits", "64 derniers bits réseau", "Multicast"], a: 0, e: "En IPv6, on divise généralement l'adresse en deux parties égales de 64 bits." },
+    { q: "Organisme gérant les IP mondiales ?", options: ["IEEE", "IANA/ICANN", "W3C", "ISO"], a: 1, e: "L'IANA délègue la gestion des adresses IP au niveau mondial." },
+    { q: "Équipement couche 2 utilisant les adresses MAC ?", options: ["Hub", "Routeur", "Switch", "Serveur"], a: 2, e: "Le commutateur (Switch) utilise la table MAC pour diriger les trames." },
+    { q: "SaaS signifie ?", options: ["Storage as a Service", "Software as a Service", "System as a Service", "Switch as a Service"], a: 1, e: "Logiciel fourni comme un service via Internet (ex: Microsoft 365)." },
+    { q: "Adresse 169.254.x.x indique ?", options: ["Internet OK", "DHCP OK", "Échec DHCP (APIPA)", "IPv6"], a: 2, e: "C'est une adresse auto-assignée quand le serveur DHCP est injoignable." }
+];
+
+let state = { name:"", school:"", major:"", cur:0, ans: new Array(40).fill(null), time:1200, active:true };
+let timer;
+
+function startQuiz() {
+    state.name = document.getElementById('name').value.trim();
+    state.school = document.getElementById('school').value.trim();
+    state.major = document.getElementById('major').value.trim();
+    if(!state.name || !state.school || !state.major) return alert("Veuillez remplir tous les champs.");
+
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('quiz-header').style.display='flex';
+    document.getElementById('quiz-content').style.display='block';
+    document.getElementById('quiz-footer').style.display='flex';
+    
+    // Mise à jour de la barre de progression avec toutes les infos demandées
+    document.getElementById('display-info').innerHTML = `
+        <strong>Étudiant :</strong> ${state.name} | <strong>Filière :</strong> ${state.major}<br>
+        <strong>Enseignant :</strong> Elvis TCHIMEGNI
+    `;
+
+    render();
+    timer = setInterval(tick, 1000);
+}
+
+function tick() {
+    state.time--;
+    let m = Math.floor(state.time/60).toString().padStart(2,'0');
+    let s = (state.time%60).toString().padStart(2,'0');
+    document.getElementById('timer').textContent = `${m}:${s}`;
+    if(state.time <= 0) { clearInterval(timer); finish(true); }
+}
+
+function render() {
+    const cont = document.getElementById('quiz-content');
+    QUESTIONS.forEach((q, i) => {
+        const div = document.createElement('div');
+        div.className = `question-card ${i===0?'active':''}`;
+        div.id = `qc-${i}`;
+        div.innerHTML = `<div class="q-text" style="font-size:1.2rem; font-weight:bold; margin-bottom:20px;">${i+1}. ${q.q}</div>` + 
+            q.options.map((o,oi)=>`<div class="option" id="q${i}o${oi}" onclick="sel(${i},${oi})">${o}</div>`).join('');
+        cont.appendChild(div);
+    });
+}
+
+function sel(qi, oi) {
+    if(!state.active) return;
+    state.ans[qi] = oi;
+    document.querySelectorAll(`#qc-${qi} .option`).forEach(el=>el.classList.remove('selected'));
+    document.getElementById(`q${qi}o${oi}`).classList.add('selected');
+    document.getElementById('missing-alert').style.display='none';
+}
+
+function move(d) {
+    if(state.cur + d < 0 || state.cur + d >= 40) return;
+    document.getElementById(`qc-${state.cur}`).classList.remove('active');
+    state.cur += d;
+    document.getElementById(`qc-${state.cur}`).classList.add('active');
+    document.getElementById('q-counter').textContent = `${state.cur+1} / 40`;
+    document.getElementById('next-btn').style.display = (state.cur===39)?'none':'block';
+    document.getElementById('finish-btn').style.display = (state.cur===39)?'block':'none';
+    document.getElementById('progress-bar').style.width = `${((state.cur+1)/40)*100}%`;
+}
+
+// Navigation directe vers une question oubliée
+function jumpTo(idx) {
+    document.getElementById(`qc-${state.cur}`).classList.remove('active');
+    state.cur = idx;
+    document.getElementById(`qc-${state.cur}`).classList.add('active');
+    document.getElementById('q-counter').textContent = `${state.cur+1} / 40`;
+    document.getElementById('next-btn').style.display = (state.cur===39)?'none':'block';
+    document.getElementById('finish-btn').style.display = (state.cur===39)?'block':'none';
+    document.getElementById('progress-bar').style.width = `${((state.cur+1)/40)*100}%`;
+}
+
+function checkCompletion() {
+    let m = []; state.ans.forEach((a,i)=>{if(a===null) m.push(i)});
+    if(m.length>0) {
+        document.getElementById('missing-alert').style.display='block';
+        document.getElementById('missing-list').innerHTML = m.map(i => `<span class="q-link" onclick="jumpTo(${i})">${i+1}</span>`).join(' ');
+    } else { finish(false); }
+}
+
+function finish(isTimeout) {
+    clearInterval(timer);
+    state.active = false;
+    
+    /** * SÉCURITÉ UNICITÉ : Décommentez la ligne ci-dessous pour activer le verrouillage.
+     */
+     localStorage.setItem('ccna_exam_submitted', 'true');
+
+    let score = 0;
+    state.ans.forEach((a,i)=>{if(a===QUESTIONS[i].a) score++});
+
+    document.getElementById('quiz-header').style.display='none';
+    document.getElementById('quiz-content').style.display='none';
+    document.getElementById('quiz-footer').style.display='none';
+    document.getElementById('result-screen').style.display='block';
+
+    const decision = document.getElementById('decision-box');
+    if(score >= 35) { decision.textContent = "ADMIS (RÉUSSITE)"; decision.className = "decision pass"; }
+    else { decision.textContent = "ÉCHEC"; decision.className = "decision fail"; }
+
+    document.getElementById('final-score').textContent = `${score} / 40`;
+    
+    // Rapport final détaillé avec infos et nom de l'enseignant
+    document.getElementById('student-report').innerHTML = `
+        <strong>Candidat :</strong> ${state.name}<br>
+        <strong>Filière :</strong> ${state.major}<br>
+        <strong>Établissement :</strong> ${state.school}<br>
+        <strong>Enseignant :</strong> Elvis TCHIMEGNI<br>
+        <strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}
+    `;
+
+    const corr = document.getElementById('correction-area');
+    QUESTIONS.forEach((q,i)=>{
+        const isC = state.ans[i] === q.a;
+        corr.innerHTML += `
+        <div class="correction-item">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:bold;">Question ${i+1}</span>
+                <span class="status-badge ${isC?'status-correct':'status-wrong'}">
+                    ${isC ? '✅ CORRECT' : '❌ INCORRECT'}
+                </span>
+            </div>
+            <p style="margin:10px 0;"><strong>Enoncé :</strong> ${q.q}</p>
+            <p style="margin:5px 0; color: ${isC?'#166534':'#991b1b'}">
+                <strong>Réponse soumise :</strong> ${state.ans[i] !== null ? q.options[state.ans[i]] : 'Aucune'}
+            </p>
+            ${!isC ? `<p style="margin:5px 0; color: #166534;"><strong>Bonne réponse :</strong> ${q.options[q.a]}</p>` : ''}
+            <div class="explanation-box">
+                💡 <strong>Explication :</strong> ${q.e}
+            </div>
+        </div>`;
+    });
+}
+</script>
+</body>
+</html>
